@@ -31,6 +31,7 @@ while turn<=9:
             break
     elif turn%2==order[computer]:
         print("The computer is making a move...")
+        sleep(1)
         board.computerMove()
         if(board.isComputerWin()):
             board.display()
