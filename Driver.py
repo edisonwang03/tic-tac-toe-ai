@@ -120,6 +120,7 @@ while not done:
     drawGrid()
     drawMarkers()
     
+    # Draws the processing message and updates the timer
     if isProcessing:
         drawProcessing()
         computerProcessingTimer+=1
