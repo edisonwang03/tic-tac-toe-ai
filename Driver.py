@@ -17,6 +17,17 @@ BLUE = (0,0,255)
 YELLOW = (255,255,200)
 TEXT_FONT = pygame.font.SysFont(None, 40)
 
+# Initialize game variables
+players = [1,-1] # 1 represents the user's symbol, X, while -1 represents the computer's symbol, O
+currentPlayerTurn = random.choice(players)
+board = Board(1,-1)
+computerProcessingTimer = 0
+if currentPlayerTurn == -1:
+    isProcessing = True
+else:
+    isProcessing = False
+gameOver = False
+
 
 # Initialize play again button
 playAgainRectangle = Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2, 160, 50)
@@ -46,7 +57,14 @@ def drawMarkers():
                 pygame.draw.circle(screen,RED,(x_pos*100+50,y_pos*100+50),38,LINE_WIDTH)
             y_pos +=1
         x_pos +=1
-        
+
+# Draw the computer processing messages
+def drawProcessing():
+    processingText = "Processing..."
+    processingImage = TEXT_FONT.render(processingText,True,BLUE)
+    processingRectangle = pygame.draw.rect(screen,GREEN,(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 60, 200, 50))
+    screen.blit(processingImage,processingImage.get_rect(center = processingRectangle.center))
+
 
 # Draw the game over UI     
 def drawResults(winner):
@@ -64,16 +82,10 @@ def drawResults(winner):
     playAgainImage = TEXT_FONT.render(playAgainText,True,BLUE)
     pygame.draw.rect(screen,GREEN,playAgainRectangle)
     screen.blit(playAgainImage,playAgainImage.get_rect(center = playAgainRectangle.center))
-     
-            
-# Initialize game variables
-players = [1,-1] # 1 represents the user's symbol, X, while -1 represents the computer's symbol, O
-currentPlayerTurn = random.choice(players)
-board = Board(1,-1)
-gameOver = False
-done = False
+
 
 # Game loop
+done = False
 while not done:
     
     # Add event handlers
@@ -89,6 +101,7 @@ while not done:
             if board.grid[cell_x][cell_y] == 0:
                 board.grid[cell_x][cell_y] = 1
                 currentPlayerTurn *= -1
+                isProcessing = True
         
         # Reset game variables
         if event.type == pygame.MOUSEBUTTONDOWN and gameOver:
@@ -96,8 +109,20 @@ while not done:
             if playAgainRectangle.collidepoint(pos):
                 currentPlayerTurn = random.choice(players)
                 board = Board(1,-1)
-                gameOver = False           
+                computerProcessingTimer = 0
+                if currentPlayerTurn == -1:
+                    isProcessing = True
+                else:
+                    isProcessing = False
+                gameOver = False     
     
+    # Draw the game
+    drawGrid()
+    drawMarkers()
+    
+    if isProcessing:
+        drawProcessing()
+        computerProcessingTimer+=1
     
     # Check if the game is over
     if board.isUserWin() or board.isComputerWin() or board.isDraw():
@@ -105,14 +130,11 @@ while not done:
         
          
     # Computer move     
-    if currentPlayerTurn == -1 and not gameOver:
+    if currentPlayerTurn == -1 and not gameOver and computerProcessingTimer == 5000:
         board.computerMove()
         currentPlayerTurn*=-1
-    
-    
-    # Draw the game
-    drawGrid()
-    drawMarkers()
+        computerProcessingTimer = 0
+        isProcessing = False
     
     # Draw the game over UI
     if gameOver:
