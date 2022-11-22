@@ -1,4 +1,4 @@
-# UltimateTicTacToe
+# Ultimate Tic-Tac-Toe
 
 A program that simulates a Tic-Tac-Toe game. Uses the minimax algorithm to create an unbeatable AI,
 where the only possible endings to the game are losing and drawing.
